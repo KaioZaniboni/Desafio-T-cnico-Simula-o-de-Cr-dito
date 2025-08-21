@@ -1,200 +1,166 @@
-# 🏦 API de Simulação de Crédito
+# 🏦 Simulação de Crédito API
 
-API REST desenvolvida em .NET 8 para simulação de empréstimos com cálculos financeiros SAC e PRICE, integrada com banco de dados Azure SQL Server.
+API para simulação de empréstimos com cálculos SAC e PRICE, desenvolvida em .NET 8 seguindo os princípios de Clean Architecture.
 
-## 🎯 **Status do Projeto**
+## 🏗️ Arquitetura
 
-✅ **IMPLEMENTAÇÃO CONCLUÍDA E FUNCIONAL**
-
-- ✅ Conectado ao banco de dados Azure SQL Server real
-- ✅ Endpoint principal de simulação funcionando
-- ✅ Cálculos financeiros SAC e PRICE implementados
-- ✅ Validações de negócio aplicadas
-- ✅ Documentação Swagger disponível
-- ✅ Logs estruturados
-- ✅ Health check implementado
-
-## 🏗️ **Arquitetura**
-
-### **Estrutura do Projeto (Projeto Único)**
 ```
 SimulacaoCredito/
-├── Controllers/           # Controllers da API REST
-├── Models/               # Entidades e DTOs
-│   ├── DTOs/            # Data Transfer Objects
-├── Services/            # Lógica de negócio
-├── Data/               # Contexto Entity Framework
-├── Program.cs          # Configuração da aplicação
-└── appsettings.json    # Configurações
+├── src/
+│   ├── SimulacaoCredito.Api/          # Camada de apresentação (Controllers, DTOs)
+│   ├── SimulacaoCredito.Application/  # Casos de uso e serviços de aplicação
+│   ├── SimulacaoCredito.Domain/       # Entidades e regras de negócio
+│   └── SimulacaoCredito.Infrastructure/ # Acesso a dados e integrações externas
+├── tests/
+│   ├── SimulacaoCredito.Api.Tests/
+│   ├── SimulacaoCredito.Application.Tests/
+│   └── SimulacaoCredito.Domain.Tests/
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+└── docs/
 ```
 
-### **Tecnologias Utilizadas**
+## 🚀 Funcionalidades
+
+- ✅ **Simulação de Empréstimos** - Cálculos SAC e PRICE
+- ✅ **Validação de Produtos** - Baseada em parâmetros do banco de dados
+- ✅ **Integração EventHub** - Envio de eventos de simulação
+- ✅ **Persistência** - Armazenamento de simulações realizadas
+- ✅ **Relatórios** - Volume por produto/dia e telemetria
+- ✅ **Containerização** - Docker e Docker Compose
+
+## 📋 Endpoints
+
+### 🔄 Simulação
+- `POST /api/simulacao` - Realizar simulação de empréstimo
+
+### 📊 Consultas
+- `GET /api/simulacoes` - Listar simulações (com paginação)
+- `GET /api/relatorio/volume-produto-dia` - Volume simulado por produto/dia
+- `GET /api/telemetria` - Dados de telemetria e performance
+
+## 🛠️ Tecnologias
+
 - **.NET 8** - Framework principal
-- **ASP.NET Core Web API** - API REST
-- **Entity Framework Core** - ORM
-- **SQL Server** - Banco de dados (Azure)
-- **Swagger/OpenAPI** - Documentação
-- **Serilog** - Logging estruturado
+- **Entity Framework Core** - ORM para acesso a dados
+- **SQL Server** - Banco de dados
+- **Azure EventHub** - Mensageria
+- **Docker** - Containerização
+- **xUnit** - Testes unitários
+- **Swagger** - Documentação da API
 
-## 🗄️ **Banco de Dados**
+## ⚙️ Configuração
 
-### **Conexão**
-- **Servidor**: `dbhackathon.database.windows.net`
-- **Banco**: `hack`
-- **Tabela Principal**: `dbo.Produto`
-
-### **Estrutura da Tabela Produto**
-```sql
-dbo.Produto
-├── CodigoProduto (int, PK)
-├── NomeProduto (varchar)
-├── TaxaJuros (decimal)
-├── MinimoMeses (int)
-├── MaximoMeses (int, nullable)
-├── ValorMinimo (decimal)
-└── ValorMaximo (decimal, nullable)
-```
-
-## 🎮 **Endpoints da API**
-
-### **Base URL**: `http://localhost:5157`
-
-| Método | Endpoint | Status | Descrição |
-|--------|----------|--------|-----------|
-| POST | `/api/simulacao` | ✅ **Funcionando** | Realizar simulação de crédito |
-| GET | `/api/simulacoes` | ⚠️ Erro esperado | Listar simulações (tabela não existe) |
-| GET | `/api/relatorio/volume-produto-dia` | ⚠️ Erro esperado | Volume por produto (tabela não existe) |
-| GET | `/api/telemetria` | ✅ **Funcionando** | Métricas da API |
-| GET | `/health` | ✅ **Funcionando** | Health check |
-| GET | `/` | ✅ **Funcionando** | Documentação Swagger |
-
-## 🧮 **Funcionalidades Implementadas**
-
-### **1. Simulação de Crédito**
-- ✅ Validação de parâmetros de entrada
-- ✅ Busca de produto adequado no banco real
-- ✅ Cálculo SAC (Sistema de Amortização Constante)
-- ✅ Cálculo PRICE (Tabela Price)
-- ✅ Geração de ID único para simulação
-- ✅ Retorno estruturado com todas as parcelas
-
-### **2. Cálculos Financeiros**
-- ✅ **SAC**: Amortização constante, juros decrescentes
-- ✅ **PRICE**: Prestação fixa, amortização crescente
-- ✅ Arredondamentos corretos (2 casas decimais)
-- ✅ Validação de parâmetros matemáticos
-
-### **3. Validações de Negócio**
-- ✅ Valor mínimo e máximo por produto
-- ✅ Prazo mínimo e máximo por produto
-- ✅ Seleção do produto com menor taxa de juros
-- ✅ Tratamento de erros e exceções
-
-## 🚀 **Como Executar**
-
-### **Pré-requisitos**
+### Pré-requisitos
 - .NET 8 SDK
-- Acesso à internet (para conexão com Azure SQL)
+- Docker Desktop
+- SQL Server (Azure)
 
-### **Execução**
+### Variáveis de Ambiente
+
 ```bash
-cd SimulacaoCredito
+# Banco de dados
+ConnectionStrings__DefaultConnection=Server=dbhackathon.database.windows.net,1433;Database=hack;User Id=hack;Password=Password123;
+
+# EventHub
+EventHub__ConnectionString=Endpoint=sb://eventhack.servicebus.windows.net/;SharedAccessKeyName=hack;SharedAccessKey=HeHeVaVayVkntO2FnjQcs2Ilh/4MUDo4y+AEhKp8z+g=;EntityPath=simulacoes
+```
+
+## 🐳 Execução com Docker
+
+### Desenvolvimento
+```bash
+# Executar com docker-compose
+docker-compose -f docker/docker-compose.yml up --build
+
+# A API estará disponível em:
+# HTTP: http://localhost:8080
+# HTTPS: https://localhost:8443
+# Swagger: http://localhost:8080/swagger
+```
+
+### Produção
+```bash
+# Build da imagem
+docker build -f docker/Dockerfile -t simulacao-credito-api .
+
+# Executar container
+docker run -p 8080:80 simulacao-credito-api
+```
+
+## 🧪 Testes
+
+```bash
+# Executar todos os testes
+dotnet test
+
+# Executar testes com cobertura
+dotnet test --collect:"XPlat Code Coverage"
+
+# Executar testes específicos
+dotnet test tests/SimulacaoCredito.Domain.Tests/
+```
+
+## 📊 Estrutura do Banco de Dados
+
+### Tabela PRODUTO
+```sql
+CREATE TABLE dbo.PRODUTO (
+    CO_PRODUTO int NOT NULL primary key,
+    NO_PRODUTO varchar(200) NOT NULL,
+    PC_TAXA_JUROS numeric(18,9) NOT NULL,
+    NU_MINIMO_MESES smallint NOT NULL,
+    NU_MAXIMO_MESES smallint NULL,
+    VR_MINIMO numeric(18,2) NOT NULL,
+    VR_MAXIMO numeric(18,2) NULL
+);
+```
+
+## 📈 Monitoramento
+
+A API inclui:
+- **Health Checks** - Verificação de saúde da aplicação
+- **Telemetria** - Métricas de performance e uso
+- **Logs estruturados** - Para debugging e monitoramento
+
+## 🔒 Segurança
+
+- Validação de entrada rigorosa
+- Tratamento de exceções centralizado
+- Logs de auditoria
+- Configuração segura de conexões
+
+## 📝 Desenvolvimento
+
+### Executar localmente
+```bash
+# Restaurar dependências
 dotnet restore
-dotnet build
-dotnet run
+
+# Executar a API
+dotnet run --project src/SimulacaoCredito.Api
+
+# A API estará disponível em:
+# HTTP: http://localhost:5000
+# HTTPS: https://localhost:5001
+# Swagger: http://localhost:5000/swagger
 ```
 
-### **Acesso**
-- **API**: http://localhost:5157
-- **Swagger**: http://localhost:5157 (raiz)
-- **Health Check**: http://localhost:5157/health
+### Estrutura de Commits
+- `feat:` - Nova funcionalidade
+- `fix:` - Correção de bug
+- `docs:` - Documentação
+- `test:` - Testes
+- `refactor:` - Refatoração
 
-## 📝 **Exemplo de Uso**
+## 📞 Suporte
 
-### **Requisição de Simulação**
-```bash
-POST /api/simulacao
-Content-Type: application/json
+Para dúvidas ou problemas:
+1. Verifique a documentação da API no Swagger
+2. Consulte os logs da aplicação
+3. Execute os testes para validar o ambiente
 
-{
-  "valorDesejado": 10000,
-  "prazo": 12
-}
-```
+## 📄 Licença
 
-### **Resposta de Sucesso**
-```json
-{
-  "idSimulacao": 20250821021737,
-  "codigoProduto": 1,
-  "descricaoProduto": "Produto 1",
-  "taxaJuros": 0.017900000,
-  "percentualSucesso": 0.98,
-  "resultadoSimulacao": {
-    "tipo": "SAC",
-    "parcelas": [
-      {
-        "numero": 1,
-        "valorAmortizacao": 833.33,
-        "valorJuros": 179.00,
-        "valorPrestacao": 1012.33
-      },
-      // ... demais parcelas
-    ]
-  }
-}
-```
-
-## 🔧 **Configurações**
-
-### **Connection String**
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=dbhackathon.database.windows.net,1433;Database=hack;User Id=hack;Password=Password23;Encrypt=True;TrustServerCertificate=False;"
-  }
-}
-```
-
-### **EventHub (Configurado mas não implementado)**
-```json
-{
-  "EventHub": {
-    "ConnectionString": "Endpoint=sb://eventhack.servicebus.windows.net/;SharedAccessKeyName=hack;SharedAccessKey=HeHeVaVayVkntO2FnjQcs2Ilh/4MUDo4y+AEhKp8z+g=;EntityPath=simulacoes"
-  }
-}
-```
-
-## ⚠️ **Limitações Conhecidas**
-
-1. **Tabelas de Simulação**: Os endpoints que dependem das tabelas `SIMULACAO` e `PARCELA_SIMULACAO` retornam erro 500 pois essas tabelas não existem no banco de dados atual.
-
-2. **Persistência**: As simulações são calculadas mas não são persistidas no banco (devido à ausência das tabelas).
-
-3. **EventHub**: Integração configurada mas não implementada.
-
-## 🎯 **Próximos Passos (Se Necessário)**
-
-1. Criar tabelas `SIMULACAO` e `PARCELA_SIMULACAO` no banco
-2. Implementar persistência das simulações
-3. Implementar integração com EventHub
-4. Adicionar testes unitários
-5. Implementar autenticação/autorização
-
-## 📊 **Métricas de Qualidade**
-
-- ✅ **Compilação**: Sem erros
-- ✅ **Funcionalidade Core**: 100% operacional
-- ✅ **Documentação**: Swagger completo
-- ✅ **Logs**: Estruturados e informativos
-- ✅ **Tratamento de Erros**: Implementado
-- ✅ **Validações**: Completas
-
-## 👨‍💻 **Desenvolvido Por**
-
-Implementação realizada seguindo as melhores práticas de desenvolvimento .NET e arquitetura de APIs REST.
-
----
-
-**Data da Última Atualização**: 21/08/2025  
-**Status**: ✅ Funcional e Pronto para Uso
+Este projeto foi desenvolvido como parte de um desafio técnico.
